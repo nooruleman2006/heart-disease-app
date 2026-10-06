@@ -32,14 +32,10 @@ def set_example(thalach, oldpeak, ca, thal_label):
     st.session_state.ca = ca
     st.session_state.thal_label = thal_label
 
-# ---------- Styling ----------
+# ---------- Styling (works in both light and dark themes) ----------
 st.markdown("""
 <style>
-.stApp {
-    background: radial-gradient(circle at 15% 10%, #2a0f1f 0%, #0b0f1a 45%),
-                linear-gradient(180deg, #0b0f1a, #0b0f1a);
-}
-#MainMenu, footer {visibility: hidden;}
+footer {visibility: hidden;}
 
 .hero {
     position: relative; overflow: hidden;
@@ -54,7 +50,7 @@ st.markdown("""
     background: rgba(255,255,255,0.10);
 }
 .hero h1 { margin: 0; font-size: 2.4rem; font-weight: 800; color: #fff; }
-.hero p  { margin: 8px 0 0 0; font-size: 1.05rem; opacity: 0.92; }
+.hero p  { margin: 8px 0 0 0; font-size: 1.05rem; opacity: 0.92; color: #fff; }
 .heart { display: inline-block; animation: beat 1.2s infinite; }
 @keyframes beat {
     0%, 100% { transform: scale(1); }
@@ -66,21 +62,20 @@ st.markdown("""
 .badge {
     display: inline-block; padding: 5px 14px; margin: 0 8px 6px 0;
     background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.35);
-    border-radius: 999px; font-size: 0.85rem; backdrop-filter: blur(4px);
+    border-radius: 999px; font-size: 0.85rem; color: #fff;
 }
 
 .glass {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(128,128,128,0.08);
+    border: 1px solid rgba(128,128,128,0.25);
     border-radius: 18px; padding: 20px 22px; margin-bottom: 16px;
-    backdrop-filter: blur(8px);
 }
-.section-title { font-size: 1.1rem; font-weight: 700; color: #ff7a93; margin-bottom: 4px; }
+.section-title { font-size: 1.1rem; font-weight: 700; color: #e91e63; margin-bottom: 4px; }
 
 .result { border-radius: 20px; padding: 24px 28px; margin-top: 10px; }
-.result.bad  { background: linear-gradient(135deg, rgba(244,67,54,0.25), rgba(183,28,28,0.15));
+.result.bad  { background: linear-gradient(135deg, rgba(244,67,54,0.22), rgba(183,28,28,0.10));
                border: 1px solid #ef5350; box-shadow: 0 0 30px rgba(239,83,80,0.25); }
-.result.good { background: linear-gradient(135deg, rgba(76,175,80,0.25), rgba(27,94,32,0.15));
+.result.good { background: linear-gradient(135deg, rgba(76,175,80,0.22), rgba(27,94,32,0.10));
                border: 1px solid #66bb6a; box-shadow: 0 0 30px rgba(102,187,106,0.25); }
 .result h2 { margin: 0; font-size: 1.9rem; }
 .result p  { margin: 8px 0 0 0; opacity: 0.9; }
@@ -92,7 +87,8 @@ st.markdown("""
 }
 .marker {
     position: absolute; top: -7px; width: 6px; height: 30px;
-    background: #fff; border-radius: 4px; box-shadow: 0 0 10px rgba(255,255,255,0.9);
+    background: #fff; border: 1px solid #555; border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
     transform: translateX(-50%);
 }
 .gauge-labels { display: flex; justify-content: space-between;
@@ -100,21 +96,21 @@ st.markdown("""
 
 .bar-row { margin: 10px 0; }
 .bar-head { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px; }
-.bar-bg { background: rgba(255,255,255,0.10); border-radius: 999px; height: 9px; }
+.bar-bg { background: rgba(128,128,128,0.25); border-radius: 999px; height: 9px; }
 .bar-fill { height: 9px; border-radius: 999px;
             background: linear-gradient(90deg, #ff4b6e, #ff9a6e); }
 
 .attr-card { border-left: 5px solid #ff4b6e; }
-.attr-card h4 { margin: 0 0 4px 0; color: #ff7a93; }
+.attr-card h4 { margin: 0 0 4px 0; color: #e91e63; }
 .attr-card p { margin: 0; opacity: 0.88; font-size: 0.95rem; }
 
 div.stButton > button {
     border-radius: 14px; font-weight: 700; height: 3rem;
-    border: 1px solid rgba(255,255,255,0.18);
+    border: 1px solid rgba(128,128,128,0.35);
 }
 div.stButton > button[kind="primary"] {
     background: linear-gradient(90deg, #ff4b6e, #c2185b);
-    border: none; font-size: 1.1rem;
+    border: none; font-size: 1.1rem; color: #fff;
     box-shadow: 0 6px 20px rgba(255,75,110,0.4);
 }
 .small-note { font-size: 0.8rem; opacity: 0.65; text-align: center; margin-top: 18px; }
@@ -170,7 +166,6 @@ with tab_predict:
     thal = THAL_MAP[thal_label]
 
     with right:
-        # Live position bars (where each value sits within its range)
         def bar(label, value_text, frac):
             pct = int(max(0, min(1, frac)) * 100)
             return (f'<div class="bar-row"><div class="bar-head"><span>{label}</span>'
